@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bốc Thăm Lì Xì May Mắn - To & Đẹp</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Montserrat:wght@700&display=swap');
+
+        :root {
+            --primary-red: #e63946;
+            --gold: #ffcf40;
+            --dark-red: #a80000;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            background: radial-gradient(circle, #f44336, #8e0000);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        /* Hiệu ứng pháo hoa nhẹ nền */
+        .firework {
+            position: absolute;
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            box-shadow: 0 0 20px 2px white;
+            animation: explode 2s infinite;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        @keyframes explode {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(30); opacity: 0; }
+        }
+
+        /* Panel cài đặt */
+        .settings-panel {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 30px;
+            border: 5px solid var(--gold);
+            z-index: 100;
+            width: 450px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            color: #333;
+        }
+
+        .settings-panel h2 { 
+            color: var(--dark-red); 
+            font-family: 'Pacifico', cursive;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+        }
+
+        .denom-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            align-items: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        input[type="number"] {
+            width: 80px;
+            padding: 10px;
+            border-radius: 10px;
+            border: 2px solid #ddd;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #ffcf40, #ffab00);
+            color: #8e0000;
+            border: none;
+            padding: 20px 50px;
+            font-size: 1.5rem;
+            font-weight: 900;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            transition: 0.3s;
+            margin-top: 30px;
+            text-transform: uppercase;
+        }
+
+        .btn-start:hover { transform: scale(1.1); box-shadow: 0 15px 30px var(--gold); }
+
+        /* Màn hình bốc thăm */
+        #game-screen {
+            display: none;
+            text-align: center;
+            z-index: 10;
+        }
+
+        /* Bao lì xì KHỔ LỚN */
+        .envelope {
+            width: 250px;
+            height: 400px;
+            background: linear-gradient(145deg, #d32f2f, #b71c1c);
+            border: 6px solid var(--gold);
+            border-radius: 15px;
+            margin: 20px auto;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 6rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            transition: all 0.4s ease;
+        }
+
+        .envelope:hover { transform: translateY(-10px) scale(1.05); }
+
+        .envelope.shake { animation: big-shake 0.8s infinite; }
+
+        @keyframes big-shake {
+            0% { transform: rotate(0); }
+            25% { transform: rotate(3deg); }
+            50% { transform: rotate(0); }
+            75% { transform: rotate(-3deg); }
+            100% { transform: rotate(0); }
+        }
+
+        /* Hiển thị tiền KHỔ LỚN */
+        .money-result {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            z-index: 200;
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .money-result.show {
+            display: block;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .money-img {
+            width: 700px; /* Tờ tiền rất to */
+            max-width: 95vw;
+            border-radius: 15px;
+            box-shadow: 0 0 100px rgba(255, 207, 64, 0.9);
+            border: 5px solid white;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top:0; left:0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 150;
+            backdrop-filter: blur(5px);
+        }
+
+        .win-announcement {
+            color: var(--gold);
+            font-size: 3rem;
+            text-shadow: 0 0 20px red;
+            margin-bottom: 20px;
+            font-family: 'Pacifico', cursive;
+        }
+
+        .status-text { font-size: 1.5rem; color: var(--gold); margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <!-- Các hạt pháo hoa trang trí -->
+    <div class="firework" style="top: 20%; left: 10%;"></div>
+    <div class="firework" style="top: 10%; right: 20%; animation-delay: 0.5s;"></div>
+    <div class="firework" style="bottom: 15%; left: 30%; animation-delay: 1.2s;"></div>
+
+    <!-- Cài đặt -->
+    <div id="setup-panel" class="settings-panel">
+        <h2>Lì Xì Tết 2026</h2>
+        <div id="config-list">
+            <div class="denom-row"><span>🧧 500.000đ</span> <input type="number" data-val="500000" value="2"></div>
+            <div class="denom-row"><span>🧧 200.000đ</span> <input type="number" data-val="200000" value="5"></div>
+            <div class="denom-row"><span>🧧 100.000đ</span> <input type="number" data-val="100000" value="10"></div>
+            <div class="denom-row"><span>🧧 50.000đ</span> <input type="number" data-val="50000" value="20"></div>
+            <div class="denom-row"><span>🧧 20.000đ</span> <input type="number" data-val="20000" value="30"></div>
+            <div class="denom-row"><span>🧧 10.000đ</span> <input type="number" data-val="10000" value="50"></div>
+        </div>
+        <button class="btn-start" onclick="startGame()">Bắt Đầu Bốc</button>
+    </div>
+
+    <!-- Màn hình chính -->
+    <div id="game-screen">
+        <h1 style="font-family: 'Pacifico', cursive; font-size: 3.5rem; color: var(--gold); margin: 0;">Chúc Mừng Năm Mới</h1>
+        <div id="main-envelope" class="envelope shake" onclick="drawMoney()">
+            <span style="filter: drop-shadow(0 0 10px gold);">🧧</span>
+        </div>
+        <p class="status-text" id="remaining-text">Sẵn sàng bốc thăm!</p>
+        <button onclick="location.reload()" style="background: none; border: 1px solid white; color: white; cursor: pointer; padding: 5px 10px; border-radius: 5px; margin-top: 20px;">Quay lại cài đặt</button>
+    </div>
+
+    <!-- Kết quả -->
+    <div id="overlay" class="overlay" onclick="closeResult()"></div>
+    <div id="money-result" class="money-result" onclick="closeResult()">
+        <div class="win-announcement" id="win-text"></div>
+        <img id="money-img" class="money-img" src="" alt="Tờ tiền">
+        <p style="font-size: 1.5rem; margin-top: 20px; color: white;">(Bấm vào để bốc tiếp)</p>
+    </div>
+
+    <!-- Âm thanh Ting Ting nhẹ nhàng -->
+    <audio id="audio-draw" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
+
+    <script>
+        let moneyPool = [];
+        const moneyImages = {
+            500000: "https://tse3.mm.bing.net/th/id/OIP.j5LiM38Gwcr5iSv7PLntewHaDP?pid=Api&P=0&h=180",
+            200000: "https://tse3.mm.bing.net/th/id/OIP.xgphmnD_BTZKuL8xRH6h1gHaDR?pid=Api&P=0&h=180",
+            100000: "https://tse4.mm.bing.net/th/id/OIP.i9I4Ta7cLTlFCCNect3S7gHaDj?pid=Api&P=0&h=180",
+            50000: "https://tse2.mm.bing.net/th/id/OIP.RgHX1yoESW_i8f8OVS6KcQHaDh?pid=Api&P=0&h=180",
+            20000: "https://tse1.mm.bing.net/th/id/OIP.mM2n2T8cGz6JKG8xuj_ptAHaDn?pid=Api&P=0&h=180",
+            10000: "https://tse1.mm.bing.net/th/id/OIP.FgLAyb8ial1qE6RisiRQQgHaDa?pid=Api&P=0&h=180"
+        };
+
+        function startGame() {
+            moneyPool = [];
+            const inputs = document.querySelectorAll('#config-list input');
+            inputs.forEach(input => {
+                const val = parseInt(input.getAttribute('data-val'));
+                const count = parseInt(input.value);
+                for (let i = 0; i < count; i++) moneyPool.push(val);
+            });
+
+            if (moneyPool.length === 0) return alert("Vui lòng nhập số tờ tiền!");
+
+            // Trộn tiền ngẫu nhiên
+            moneyPool.sort(() => Math.random() - 0.5);
+
+            document.getElementById('setup-panel').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'block';
+            updateCount();
+        }
+
+        function updateCount() {
+            document.getElementById('remaining-text').innerText = `Còn lại ${moneyPool.length} bao lì xì chưa bốc`;
+        }
+
+        function drawMoney() {
+            if (moneyPool.length === 0) return alert("Hết sạch lì xì rồi!");
+
+            // Chạy âm thanh
+            const audio = document.getElementById('audio-draw');
+            audio.currentTime = 0;
+            audio.play();
+
+            const env = document.getElementById('main-envelope');
+            env.style.transform = "scale(0) rotate(720deg)";
+            env.style.opacity = "0";
+
+            setTimeout(() => {
+                const winValue = moneyPool.pop();
+                showResult(winValue);
+                updateCount();
+            }, 400);
+        }
+
+        function showResult(val) {
+            const resultDiv = document.getElementById('money-result');
+            const img = document.getElementById('money-img');
+            const winText = document.getElementById('win-text');
+
+            img.src = moneyImages[val];
+            winText.innerText = `🧧 Chúc mừng! Bạn nhận được ${val.toLocaleString()}đ`;
+            
+            document.getElementById('overlay').style.display = 'block';
+            resultDiv.classList.add('show');
+        }
+
+        function closeResult() {
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('money-result').classList.remove('show');
+            
+            const env = document.getElementById('main-envelope');
+            env.style.transform = "scale(1) rotate(0deg)";
+            env.style.opacity = "1";
+        }
+    </script>
+</body>
+</html>
